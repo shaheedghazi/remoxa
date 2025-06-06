@@ -1,129 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Remoxa | Law Enforcement Portal Access</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-  <style>
-    .hero-gradient {
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-    }
-    .feature-card:hover {
-      transform: translateY(-5px);
-      transition: all 0.3s ease;
-    }
-    .glow-button {
-      box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
-    }
-    .glow-button:hover {
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.9);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remoxa | Cyber Operations Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        .code-font {
+            font-family: 'Space Mono', monospace;
+        }
+        .section {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .slide-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        .slide-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .map-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            animation: pulse 2s infinite;
+            opacity: 0;
+            transform: scale(0);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .terminal-line {
+            display: block;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .terminal-line:before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+        }
+        .blur-container {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .glitch {
+            position: relative;
+        }
+        .glitch:before, .glitch:after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch:before {
+            left: 2px;
+            text-shadow: -2px 0 #ef4444;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        .glitch:after {
+            left: -2px;
+            text-shadow: -2px 0 #3b82f6;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 3s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(17px, 9999px, 50px, 0); }
+            20% { clip: rect(14px, 9999px, 30px, 0); }
+            40% { clip: rect(33px, 9999px, 60px, 0); }
+            60% { clip: rect(81px, 9999px, 48px, 0); }
+            80% { clip: rect(6px, 9999px, 42px, 0); }
+            100% { clip: rect(38px, 9999px, 71px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(12px, 9999px, 99px, 0); }
+            20% { clip: rect(35px, 9999px, 49px, 0); }
+            40% { clip: rect(17px, 9999px, 89px, 0); }
+            60% { clip: rect(66px, 9999px, 42px, 0); }
+            80% { clip: rect(21px, 9999px, 75px, 0); }
+            100% { clip: rect(58px, 9999px, 33px, 0); }
+        }
+        .typewriter {
+            border-right: 2px solid rgba(255,255,255,0.75);
+            white-space: nowrap;
+            overflow: hidden;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: rgba(255,255,255,0.75) }
+        }
+        .hud-element {
+            background: linear-gradient(145deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1));
+            border: 1px solid rgba(59,130,246,0.2);
+            box-shadow: 0 0 15px rgba(16,185,129,0.1);
+        }
+        .redacted {
+            color: transparent;
+            position: relative;
+            background-color: #1f2937;
+            border-radius: 2px;
+        }
+        .redacted:hover {
+            color: inherit;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .terminal-input {
+            caret-color: #10b981;
+            outline: none;
+        }
+        .map-container {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDAwIj48cGF0aCBkPSJNNDAwIDBsLTE1MCAxNTAgMTUwIDE1MCAxNTAtMTUwek00MDAgNDAwdi0yMDBsLTEwMC0xMDBoMjAweiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzc0MTUxIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=');
+            background-size: cover;
+        }
+    </style>
 </head>
-<body class="font-sans antialiased text-gray-900">
-  <!-- Main Content -->
-  <main>
-    <!-- Hero Section -->
-    <section class="hero-gradient text-white">
-      <div
-        class="container mx-auto px-6 py-24 flex flex-col items-center justify-center text-center"
-      >
-        <div class="max-w-4xl">
-          <h1 class="text-4xl md:text-6xl font-bold mb-6">
-            <span class="block">Remoxa Secure Portal</span>
-            <span class="text-blue-200">For Law Enforcement</span>
-          </h1>
-          <p class="text-xl md:text-2xl mb-10 leading-relaxed">
-            Advanced tools for data discovery, remote access and cyber
-            investigation - exclusively for authorized personnel.
-          </p>
-          <a
-            href="https://wa.me/+923295197876"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="glow-button bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-lg transition duration-300 inline-flex items-center"
-          >
-            Request Portal Access via WhatsApp
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 ml-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </a>
+<body class="antialiased">
+    <!-- Navigation Indicators -->
+    <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 hidden md:block">
+        <div class="flex flex-col space-y-4">
+            <button class="nav-dot w-3 h-3 rounded-full border border-gray-500 transition-all" data-section="1"></button>
+            <button class="nav-dot w-3 h-3 rounded-full border border-gray-500 transition-all" data-section="2"></button>
+            <button class="nav-dot w-3 h-3 rounded-full border border-gray-500 transition-all" data-section="3"></button>
+            <button class="nav-dot w-3 h-3 rounded-full border border-gray-500 transition-all" data-section="4"></button>
+            <button class="nav-dot w-3 h-3 rounded-full border border-gray-500 transition-all" data-section="5"></button>
         </div>
-      </div>
-    </section>
+    </div>
 
-    <!-- Features Section -->
-    <section class="py-20 bg-gray-50">
-      <div class="container mx-auto px-6">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Your Complete Investigation Toolkit
-          </h2>
-          <p class="max-w-2xl mx-auto text-gray-600 text-lg">
-            Secure, authorized access to specialized tools for law enforcement
-            professionals.
-          </p>
+    <!-- Scene 1: Threat Landscape -->
+    <div id="scene-1" class="section flex items-center justify-center relative bg-black px-6">
+        <div class="absolute inset-0 overflow-hidden opacity-30">
+            <div class="map-container w-full h-full"></div>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Feature 1 -->
-          <div
-            class="feature-card bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300"
-          >
-            <div class="text-blue-600 mb-6">
-              <i class="fas fa-search fa-3x"></i>
-            </div>
-            <h3 class="text-xl font-bold mb-3">Advanced Data Search</h3>
-            <p class="text-gray-600">
-              Powerful indexed search across multiple data sources with
-              forensic-grade accuracy.
+        <div class="max-w-4xl mx-auto text-center z-10">
+            <div class="text-xs code-font text-emerald-400 mb-2 tracking-widest slide-in" style="transition-delay: 0.1s">[SECURITY BRIEFING]</div>
+            <h1 class="glitch text-4xl md:text-6xl font-bold mb-6 slide-in" data-text="THREAT VECTORS ACTIVE" style="transition-delay: 0.3s">
+                <span>THREAT VECTORS ACTIVE</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 leading-relaxed slide-in" style="transition-delay: 0.5s">
+                Modern threat actors are <span class="bg-red-500/20 px-1">faster</span>, <span class="bg-red-500/20 px-1">quieter</span>,<br>
+                and more <span class="bg-red-500/20 px-1">coordinated</span> than ever.
             </p>
-          </div>
-
-          <!-- Feature 2 -->
-          <div
-            class="feature-card bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300"
-          >
-            <div class="text-blue-600 mb-6">
-              <i class="fas fa-laptop-code fa-3x"></i>
+            <div class="text-sm code-font text-gray-400 mt-16 slide-in" style="transition-delay: 0.7s">
+                [SCROLL TO CONTINUE]
             </div>
-            <h3 class="text-xl font-bold mb-3">Secure Remote Access</h3>
-            <p class="text-gray-600">
-              Encrypted remote connections with full audit logging and
-              multi-factor authentication.
-            </p>
-          </div>
-
-          <!-- Feature 3 -->
-          <div
-            class="feature-card bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300"
-          >
-            <div class="text-blue-600 mb-6">
-              <i class="fas fa-shield-alt fa-3x"></i>
-            </div>
-            <h3 class="text-xl font-bold mb-3">Phishing Simulation Tools</h3>
-            <p class="text-gray-600">
-              Authorized tools for educational purposes and cybercrime
-              prevention training.
-            </p>
-          </div>
         </div>
-      </div>
-    </section>
-  </main>
+    </div>
+
+    <!-- Scene 2: Remoxa Enters -->
+    <div id="scene-2" class="section flex items-center justify-center px-6 relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">
+        <div class="max-w-6xl mx-auto z-10">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <div class="text-xs code-font text-emerald-400 mb-2 tracking-widest slide-in">[SYSTEM INITIALIZED]</div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 slide-in" style="transition-delay: 0.2s">We don't monitor.<br>We <span class="typewriter text-emerald-400">infiltrate</span></h2>
+                    <p class="text-lg text-gray-300 mb-8 leading-relaxed slide-in" style="transition-delay: 0.4s">
+                        Remoxa provides cutting-edge penetration capability tools for specialized cyber operations.
+                    </p>
+                    <div class="flex flex-wrap gap-4 slide-in" style="transition-delay: 0.6s">
+                        <div class="hud-element rounded-lg p-4 hover:shadow-lg hover:shadow-emerald-400/10 transition-all">
+                            <div class="code-font text-emerald-400 mb-2">• RAT Deployment</div>
+                            <div class="text-sm text-gray-400">Remote access and control</div>
+                        </div>
+                        <div class="hud-element rounded-lg p-4 hover:shadow-lg hover:shadow-blue-400/10 transition-all">
+                            <div class="code-font text-blue-400 mb-2">• Phishing Kits</div>
+                            <div class="text-sm text-gray-400">High-success templates</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 relative mt-12 md:mt-0">
+                    <div class="relative h-96 w-full rounded-xl overflow-hidden border border-gray-800/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-emerald-900/10 opacity-80"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center px-8">
+                                <div class="code-font text-gray-400 mb-4">[HOVER TO PREVIEW TOOLS]</div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="h-16 w-16 rounded bg-gray-800 hover:bg-emerald-800/40 border border-gray-700 hover:border-emerald-400/20 transition-all flex items-center justify-center">
+                                        <div class="text-xs code-font text-gray-500 hover:text-emerald-300 transition-all">RAT</div>
+                                    </div>
+                                    <div class="h-16 w-16 rounded bg-gray-800 hover:bg-blue-800/40 border border-gray-700 hover:border-blue-400/20 transition-all flex items-center justify-center">
+                                        <div class="text-xs code-font text-gray-500 hover:text-blue-300 transition-all">PHISH</div>
+                                    </div>
+                                    <div class="h-16 w-16 rounded bg-gray-800 hover:bg-purple-800/40 border border-gray-700 hover:border-purple-400/20 transition-all flex items-center justify-center">
+                                        <div class="text-xs code-font text-gray-500 hover:text-purple-300 transition-all">EXPLOIT</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-sm code-font text-gray-400">
+            [SCROLL TO CONTINUE]
+        </div>
+    </div>
+
+    <!-- Scene 3: Covert Capabilities -->
+    <div id="scene-3" class="section flex items-center justify-center px-6 bg-black">
+        <div class="max-w-4xl mx-auto w-full">
+            <div class="text-xs code-font text-emerald-400 mb-2 tracking-widest slide-in">[SYSTEM CAPABILITIES]</div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-8 slide-in" style="transition-delay: 0.2s">Covert Capabilities</h2>
+            
+            <div class="terminal bg-gray-900 rounded-xl p-6 mb-8">
+                <div class="mb-4 terminal-line text-gray-300 slide-in" style="transition-delay: 0.4s">Initializing Remoxa threat suite...</div>
+                <div class="mb-4 terminal-line text-emerald-400 slide-in" style="transition-delay: 0.6s">Access granted at privilege level 9</div>
+                <div class="mb-4 terminal-line slide-in" style="transition-delay: 0.8s">
+                    <span class="text-blue-400">Available modules:</span>
+                    <div class="ml-4 mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative border border-gray-800 rounded-lg p-3 hover:border-emerald-400/50 transition-all group">
+                            <div class="absolute -right-1 -top-1 bg-emerald-500/80 text-xs px-2 py-1 rounded code-font">[89%]</div>
+                            <div class="code-font text-emerald-300 group-hover:text-white transition-all">Remote C&C</div>
+                            <div class="text-xs text-gray-400">Persistent access channels</div>
+                        </div>
+                        <div class="relative border border-gray-800 rounded-lg p-3 hover:border-blue-400/50 transition-all group">
+                            <div class="absolute -right-1 -top-1 bg-blue-500/80 text-xs px-2 py-1 rounded code-font">[76%]</div>
+                            <div class="code-font text-blue-300 group-hover:text-white transition-all">Custom Payloads</div>
+                            <div class="text-xs text-gray-400">Target-specific exploits</div>
+                        </div>
+                        <div class="relative border border-gray-800 rounded-lg p-3 hover:border-purple-400/50 transition-all group">
+                            <div class="absolute -right-1 -top-1 bg-purple-500/80 text-xs px-2 py-1 rounded code-font">[92%]</div>
+                            <div class="code-font text-purple-300 group-hover:text-white transition-all">Intel Gathering</div>
+                            <div class="text-xs text-gray-400">Stealth reconnaissance</div>
+                        </div>
+                        <div class="relative border border-gray-800 rounded-lg p-3 hover:border-yellow-400/50 transition-all group">
+                            <div class="absolute -right-1 -top-1 bg-yellow-500/80 text-xs px-2 py-1 rounded code-font">[84%]</div>
+                            <div class="code-font text-yellow-300 group-hover:text-white transition-all">Counter-Detection</div>
+                            <div class="text-xs text-gray-400">Evasion techniques</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="terminal-line flex items-center mt-6 slide-in" style="transition-delay: 1s">
+                    <span class="text-emerald-400 mr-2">root@remoxa:~$</span>
+                    <div class="flex-1 relative">
+                        <input type="text" class="terminal-input bg-transparent w-full outline-none text-gray-200 blink" placeholder="input_command --parameters" autocomplete="off">
+                        <span class="absolute right-0 text-xs text-gray-500 code-font">[TAB] for suggestions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 4: Real World Impact -->
+    <div id="scene-4" class="section flex items-center justify-center px-6 relative" style="background: linear-gradient(135deg, #111827 0%, #1f2937 100%)">
+        <div class="max-w-6xl mx-auto z-10">
+            <div class="text-xs code-font text-emerald-400 mb-2 tracking-widest slide-in">[OPERATIONS HISTORY]</div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 slide-in" style="transition-delay: 0.2s">Proven Field Results</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="rounded-xl overflow-hidden border border-gray-800/50 hover:border-emerald-400/30 transition-all duration-500 slide-in" style="transition-delay: 0.4s">
+                    <div class="bg-gray-900/50 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="text-emerald-400 code-font">[CLASSIFIED]</div>
+                            <div class="bg-emerald-400/10 text-emerald-400 text-xs px-3 py-1 rounded-full code-font">SUCCESS</div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Operation Dark Tide</h3>
+                        <p class="text-gray-300 mb-4">Coordinated takedown of financial dark web marketplace through advanced infiltration techniques.</p>
+                        <div class="flex gap-4 text-xs mt-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-emerald-400 mr-2"></div>
+                                <span class="text-gray-400">+32 arrests</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
+                                <span class="text-gray-400">$14M seized</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rounded-xl overflow-hidden border border-gray-800/50 hover:border-blue-400/30 transition-all duration-500 slide-in" style="transition-delay: 0.6s">
+                    <div class="bg-gray-900/50 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="text-blue-400 code-font">[REDACTED]</div>
+                            <div class="bg-blue-400/10 text-blue-400 text-xs px-3 py-1 rounded-full code-font">COMPLETED</div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Oper. Phantom Strike</h3>
+                        <p class="text-gray-300 mb-4">Disruption of APT group infrastructure through coordinated counter-intelligence operations.</p>
+                        <div class="flex gap-4 text-xs mt-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-purple-400 mr-2"></div>
+                                <span class="text-gray-400">+7 nations</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                                <span class="text-gray-400">18 networks</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 grid grid-cols-3 gap-4 text-center max-w-3xl mx-auto">
+                <div class="p-4 border border-gray-800 rounded-lg slide-in" style="transition-delay: 0.8s">
+                    <div class="text-4xl font-bold text-emerald-400 mb-2">+64</div>
+                    <div class="text-xs code-font text-gray-400">NEUTRALIZED THREATS</div>
+                </div>
+                <div class="p-4 border border-gray-800 rounded-lg slide-in" style="transition-delay: 1s">
+                    <div class="text-4xl font-bold text-blue-400 mb-2">89%</div>
+                    <div class="text-xs code-font text-gray-400">SUCCESS RATE</div>
+                </div>
+                <div class="p-4 border border-gray-800 rounded-lg slide-in" style="transition-delay: 1.2s">
+                    <div class="text-4xl font-bold text-purple-400 mb-2">3.2K</div>
+                    <div class="text-xs code-font text-gray-400">SYSTEMS ACCESSED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 5: Restricted Access -->
+    <div id="scene-5" class="section flex items-center justify-center px-6 bg-black">
+        <div class="max-w-md mx-auto w-full text-center">
+            <div class="relative p-8 border border-gray-800 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-900">
+                <div class="absolute -top-4 -left-4 w-8 h-8 rounded-full bg-red-500 animate-pulse"></div>
+                <div class="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-red-500 animate-pulse"></div>
+                
+                <div class="text-xs code-font text-emerald-400 mb-4">[SECURE LOGIN]</div>
+                <h2 class="text-3xl font-bold mb-2">RESTRICTED ACCESS</h2>
+                <p class="text-gray-400 mb-8">Remoxa is available to vetted government agencies<br>and select cybersecurity partners only.</p>
+                
+                <form class="mb-6">
+                    <div class="relative mb-4">
+                        <input type="text" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 outline-none focus:border-emerald-400/50 transition-all" placeholder="Agency ID">
+                        <div class="absolute right-3 top-3 text-xs code-font text-gray-500">[REQUIRED]</div>
+                    </div>
+                    <div class="relative mb-6">
+                        <input type="password" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 outline-none focus:border-emerald-400/50 transition-all" placeholder="Authorization Code">
+                        <div class="absolute right-3 top-3 text-xs code-font text-gray-500">[REDACTED]</div>
+                    </div>
+                    <button type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-400/20">
+                        REQUEST ACCESS
+                    </button>
+                </form>
+                
+                <div class="text-xs code-font text-gray-500 border-t border-gray-800 pt-4 mt-6">
+                    All access attempts are logged and monitored.<br>
+                    Unauthorized use is strictly prohibited.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize map dots for Scene 1
+        function initMapDots() {
+            const scene1 = document.getElementById('scene-1');
+            const width = scene1.offsetWidth;
+            const height = scene1.offsetHeight;
+            
+            for (let i = 0; i < 20; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'map-dot';
+                dot.style.left = `${Math.random() * width}px`;
+                dot.style.top = `${100 + Math.random() * (height - 200)}px`;
+                scene1.appendChild(dot);
+                
+                // Animate dots in with delays
+                setTimeout(() => {
+                    dot.style.opacity = '0.8';
+                    dot.style.transform = 'scale(1)';
+                }, Math.random() * 1000 + 500);
+                
+                // Make dots pulse continuously
+                setInterval(() => {
+                    dot.style.boxShadow = `0 0 0 ${Math.random() * 8}px rgba(239, 68, 68, 0.2)`;
+                }, Math.random() * 2000 + 1000);
+            }
+        }
+        
+        // Check if elements are in viewport for animations
+        function checkVisibility() {
+            const sections = document.querySelectorAll('.section');
+            const windowHeight = window.innerHeight;
+            const windowTop = window.scrollY;
+            const windowBottom = windowTop + windowHeight;
+            
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionBottom = sectionTop + sectionHeight;
+                
+                // Update navigation dots
+                const navDots = document.querySelectorAll('.nav-dot');
+                if (windowTop + windowHeight/2 >= sectionTop && windowTop + windowHeight/2 < sectionBottom) {
+                    navDots[index].classList.add('bg-emerald-500', 'border-emerald-500');
+                } else {
+                    navDots[index].classList.remove('bg-emerald-500', 'border-emerald-500');
+                }
+                
+                // Animate elements when section is 50% in view
+                if (windowBottom > sectionTop + sectionHeight/2 && windowTop < sectionBottom - sectionHeight/2) {
+                    const elements = section.querySelectorAll('.slide-in');
+                    elements.forEach(el => {
+                        el.classList.add('active');
+                    });
+                }
+            });
+        }
+        
+        // Scroll to section when clicking nav dots
+        document.querySelectorAll('.nav-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const sectionId = `scene-${dot.getAttribute('data-section')}`;
+                document.getElementById(sectionId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Typewriter effect
+        function typeWriter(element, text, speed) {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML = text.substring(0, i+1);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    setTimeout(() => {
+                        element.innerHTML = '';
+                        i = 0;
+                        setTimeout(type, 500);
+                    }, 3000);
+                }
+            }
+            type();
+        }
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            initMapDots();
+            checkVisibility();
+            
+            // Initialize typewriter effect
+            const typewriterElement = document.querySelector('.typewriter');
+            if (typewriterElement) {
+                const texts = ["infiltrate", "track", "neutralize", "analyze"];
+                let currentIndex = 0;
+                
+                function cycleTexts() {
+                    typeWriter(typewriterElement, texts[currentIndex], 100);
+                    currentIndex = (currentIndex + 1) % texts.length;
+                    setTimeout(cycleTexts, 4000);
+                }
+                
+                cycleTexts();
+            }
+        });
+        
+        window.addEventListener('scroll', checkVisibility);
+        window.addEventListener('resize', checkVisibility);
+    </script>
 </body>
 </html>
