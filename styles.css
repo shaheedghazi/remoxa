@@ -126,4 +126,128 @@ body {
 .map-container {
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDAwIj48cGF0aCBkPSJNNDAwIDBsLTE1MCAxNTAgMTUwIDE1MCAxNTAtMTUwek00MDAgNDAwdi0yMDBsLTEwMC0xMDBoMjAweiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzc0MTUxIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=');
     background-size: cover;
+}
+
+/* Enhanced tool item hover effects */
+.tool-item {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tool-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--highlight-color, rgba(16, 185, 129, 0.7)), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    opacity: 0;
+}
+
+.tool-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--highlight-color, rgba(16, 185, 129, 0.7)), transparent);
+    transform: translateX(100%);
+    transition: transform 0.6s ease;
+    opacity: 0;
+}
+
+.tool-item:hover::before {
+    transform: translateX(100%);
+    opacity: 1;
+}
+
+.tool-item:hover::after {
+    transform: translateX(-100%);
+    opacity: 1;
+}
+
+.tool-item .tool-glow {
+    position: absolute;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        var(--highlight-color, rgba(16, 185, 129, 0.3)),
+        transparent
+    );
+    transform: skewX(-20deg) translateX(-100px);
+    opacity: 0;
+    transition: transform 0.4s ease;
+}
+
+.tool-item:hover .tool-glow {
+    animation: glow-sweep 1.5s ease-in-out;
+    opacity: 0.7;
+}
+
+@keyframes glow-sweep {
+    0% {
+        transform: skewX(-20deg) translateX(-100%);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: skewX(-20deg) translateX(300%);
+        opacity: 0;
+    }
+}
+
+/* Tool category-specific hover colors */
+.tool-item[data-category="recon"] {
+    --highlight-color: rgba(16, 185, 129, 0.7);
+}
+
+.tool-item[data-category="exploit"] {
+    --highlight-color: rgba(59, 130, 246, 0.7);
+}
+
+.tool-item[data-category="post"] {
+    --highlight-color: rgba(168, 85, 247, 0.7);
+}
+
+.tool-item[data-category="defense"] {
+    --highlight-color: rgba(245, 158, 11, 0.7);
+}
+
+/* Active tool category styles */
+.tool-category {
+    transition: all 0.3s ease;
+}
+
+.tool-category.active-category {
+    transform: translateY(-5px);
+}
+
+.tool-category.active-category .text-left {
+    position: relative;
+}
+
+.tool-category.active-category .text-left::after {
+    content: '';
+    position: absolute;
+    height: 1px;
+    background: currentColor;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    animation: line-grow 0.5s forwards;
+    transform-origin: left;
+}
+
+@keyframes line-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
 } 

@@ -50,7 +50,38 @@ function checkVisibility() {
             elements.forEach(el => {
                 el.classList.add('active');
             });
+            
+            // Animate counters if present
+            const counters = section.querySelectorAll('.counter-animated');
+            animateCounters(counters);
         }
+    });
+}
+
+// Animate counters
+function animateCounters(counters) {
+    counters.forEach(counter => {
+        // Skip if already animated
+        if (counter.dataset.animated === 'true') return;
+        
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000; // ms
+        const increment = target / (duration / 30); // Update every 30ms
+        let current = 0;
+        
+        counter.dataset.animated = 'true';
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current >= target) {
+                counter.textContent = target;
+                return;
+            }
+            counter.textContent = Math.floor(current);
+            setTimeout(updateCounter, 30);
+        };
+        
+        updateCounter();
     });
 }
 
@@ -63,6 +94,161 @@ document.querySelectorAll('.nav-dot').forEach(dot => {
         });
     });
 });
+
+// Mobile navigation
+document.querySelectorAll('.mobile-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        document.getElementById(targetId).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+
+// Tool item hover effects
+function initToolItems() {
+    document.querySelectorAll('.tool-item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            const tooltip = item.getAttribute('data-tooltip');
+            const category = item.getAttribute('data-category');
+            const descContainer = document.querySelector('.tool-description');
+            const statusDisplay = document.querySelector('.tool-status');
+            
+            if (descContainer && tooltip) {
+                descContainer.textContent = tooltip;
+                descContainer.parentElement.classList.add('active');
+                
+                // Update status display based on category
+                if (statusDisplay) {
+                    switch(category) {
+                        case 'recon':
+                            statusDisplay.textContent = '[SCANNING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-emerald-500';
+                            break;
+                        case 'exploit':
+                            statusDisplay.textContent = '[EXPLOITING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-blue-500';
+                            break;
+                        case 'post':
+                            statusDisplay.textContent = '[EXECUTING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-purple-500';
+                            break;
+                        case 'defense':
+                            statusDisplay.textContent = '[EVADING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-yellow-500';
+                            break;
+                        default:
+                            statusDisplay.textContent = '[ACTIVE]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-emerald-500';
+                    }
+                }
+                
+                // Highlight the active category
+                document.querySelectorAll('.tool-category').forEach(category => {
+                    category.classList.remove('active-category');
+                });
+                
+                item.closest('.tool-category').classList.add('active-category');
+            }
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            const descContainer = document.querySelector('.tool-description');
+            const statusDisplay = document.querySelector('.tool-status');
+            
+            if (descContainer) {
+                descContainer.textContent = '';
+                descContainer.parentElement.classList.remove('active');
+                
+                if (statusDisplay) {
+                    statusDisplay.textContent = '[STANDBY]';
+                    statusDisplay.className = 'ml-auto text-[10px] text-gray-500';
+                }
+            }
+        });
+        
+        // For mobile touch
+        item.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const tooltip = item.getAttribute('data-tooltip');
+            const category = item.getAttribute('data-category');
+            const descContainer = document.querySelector('.tool-description');
+            const statusDisplay = document.querySelector('.tool-status');
+            
+            // Clear any existing descriptions first
+            document.querySelectorAll('.tool-item').forEach(otherItem => {
+                otherItem.classList.remove('active-touch');
+            });
+            
+            // Set this item as active
+            item.classList.add('active-touch');
+            
+            if (descContainer && tooltip) {
+                descContainer.textContent = tooltip;
+                descContainer.parentElement.classList.add('active');
+                
+                // Update status display based on category
+                if (statusDisplay) {
+                    switch(category) {
+                        case 'recon':
+                            statusDisplay.textContent = '[SCANNING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-emerald-500';
+                            break;
+                        case 'exploit':
+                            statusDisplay.textContent = '[EXPLOITING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-blue-500';
+                            break;
+                        case 'post':
+                            statusDisplay.textContent = '[EXECUTING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-purple-500';
+                            break;
+                        case 'defense':
+                            statusDisplay.textContent = '[EVADING]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-yellow-500';
+                            break;
+                        default:
+                            statusDisplay.textContent = '[ACTIVE]';
+                            statusDisplay.className = 'ml-auto text-[10px] text-emerald-500';
+                    }
+                }
+                
+                // Highlight the active category
+                document.querySelectorAll('.tool-category').forEach(category => {
+                    category.classList.remove('active-category');
+                });
+                
+                item.closest('.tool-category').classList.add('active-category');
+            }
+        });
+    });
+    
+    // Close tool descriptions when tapping elsewhere
+    document.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.tool-item')) {
+            document.querySelectorAll('.tool-item').forEach(item => {
+                item.classList.remove('active-touch');
+            });
+            
+            const descContainer = document.querySelector('.tool-description');
+            const statusDisplay = document.querySelector('.tool-status');
+            
+            if (descContainer) {
+                descContainer.textContent = '';
+                descContainer.parentElement.classList.remove('active');
+                
+                if (statusDisplay) {
+                    statusDisplay.textContent = '[STANDBY]';
+                    statusDisplay.className = 'ml-auto text-[10px] text-gray-500';
+                }
+            }
+            
+            document.querySelectorAll('.tool-category').forEach(category => {
+                category.classList.remove('active-category');
+            });
+        }
+    });
+}
 
 // Typewriter effect
 function typeWriter(element, text, speed) {
@@ -83,10 +269,122 @@ function typeWriter(element, text, speed) {
     type();
 }
 
+// Initialize particles.js
+function initParticles() {
+    if (window.particlesJS) {
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: '#10b981'
+                },
+                shape: {
+                    type: 'circle',
+                    stroke: {
+                        width: 0,
+                        color: '#000000'
+                    },
+                    polygon: {
+                        nb_sides: 5
+                    }
+                },
+                opacity: {
+                    value: 0.3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 2,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#3b82f6',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 1,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false,
+                    attract: {
+                        enable: false,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: 'window',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'grab'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 0.5
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+    }
+}
+
+// Handle mobile responsiveness
+function handleMobileView() {
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+        // Adjust for mobile view
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.minHeight = `${window.innerHeight}px`;
+        });
+    }
+}
+
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
     initMapDots();
     checkVisibility();
+    initToolItems();
+    initParticles();
+    handleMobileView();
     
     // Initialize typewriter effect
     const typewriterElement = document.querySelector('.typewriter');
@@ -105,4 +403,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('scroll', checkVisibility);
-window.addEventListener('resize', checkVisibility); 
+window.addEventListener('resize', () => {
+    checkVisibility();
+    handleMobileView();
+}); 
